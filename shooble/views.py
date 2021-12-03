@@ -1,3 +1,4 @@
+from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import login, logout
@@ -227,6 +228,7 @@ def like_post(request, postID):
         print(post_being_liked)
         # return redirect('index')
         return redirect(request.META.get('HTTP_REFERER'))
+        # return HttpResponse(0)
     else:
         post_being_liked.numberOfLikes -= 1
         liked_post_object.is_liked_by_user = False
