@@ -1,0 +1,30 @@
+{% extends 'shooble/base.html' %}
+{% block body %}
+    {#    <form action="{% url 'search' %}" method="post">#}
+    {#        {% csrf_token %}#}
+    {#        <label for="exampleFormControlTextarea1" class="form-label">Search for other Shooblers:</label>#}
+    {#        <input type="text" class="form-control" name="search" id="searchUsers">#}
+    {#        <button class="btn btn-primary" type="submit" id="button-addon2">Search</button>#}
+    {#    </form>#}
+    <h3>Users found with: "{{ search_query }}"</h3>
+    <p>{{ no_users }}</p>
+    <ul>
+        {% for profile in user_searched %}
+            <li>{{ profile }} {% if profile.id in list_of_ids_being_followed %} <span class="text-muted" >Following</span>{% endif %} <a href="{% url 'profile' profile.username %}">Link to profile</a>
+{#            {% if user.username != profile.username %}#}
+{#                {% if profile.id not in list_of_ids_being_followed %}#}
+                    {#                        <a href="{% url 'follow' profile.username %}">Follow</a></li>#}
+{##}
+{#                {% else %}#}
+                    {#                        <a href="{% url 'unfollow' profile.username %}">Unfollow</a>#}
+{#                    <h5>(Following)</h5>#}
+{#                {% endif %}#}
+{#            {% else %}#}
+{#                <p>This is you</p>#}
+{#            {% endif %}#}
+        {% endfor %}
+        </li>
+
+    </ul>
+
+{% endblock %}

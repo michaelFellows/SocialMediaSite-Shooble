@@ -1,0 +1,55 @@
+{% extends 'shooble/base.html' %}
+{% load index_filter %}
+{% block body %}
+    <h1>Welcome {{ user.username }}</h1>
+    <div class="mb-3">
+        <div class="bg-white rounded shadow">
+            <div class="row">
+                <form class="input-group" action="{% url 'create' %}" method="post">
+                    {% csrf_token %}
+                    <textarea class="form-control" name="textPost" id="exampleFormControlTextarea1" rows="3"
+                              placeholder="Make a post..."></textarea>
+                    <button class="d-flex btn btn-success py-4" type="submit" id="button-addon2">Post</button>
+                </form>
+            </div>
+        </div>
+        <h2 class="my-3">My Feed</h2>
+        {% for text_post in text_posts %}
+            <div class="card p-1 my-3 rounded shadow" id="{{ text_post.id }}">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-1 m-auto">
+                            <img class="img-fluid rounded-circle" src="http://placekitten.com/60/60" alt="">
+                        </div>
+                        <div class="col-lg-11 py-3 ms-0">
+                            <p class="mb-0 lead">{{ text_post.author.first_name }} {{ text_post.author.last_name }}</p>
+                            <a class="text-muted"
+                               href="{% url 'profile' text_post.author.username %}">@{{ text_post.author.username }}</a>
+                        </div>
+
+                    </div>
+                    <p class="card-text">{{ text_post.textBody }}</p>
+                    <p class="card-text text-secondary">{{ text_post.created_at }}</p>
+                    <a class="btn" href="{% url 'like_post' text_post.id %}">
+                        {#                    {{ list_of_like_data|index:forloop.counter0|get_liked }}#}
+                        {% if not list_of_like_data|index:forloop.counter0|get_liked %}
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                 class="bi bi-heart" viewBox="0 0 16 16">
+                                <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"/>
+                            </svg>
+                            {{ text_post.numberOfLikes }}
+                        {% else %}
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                 class="text-danger bi bi-heart-fill" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd"
+                                      d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z"/>
+                            </svg>
+                            <span class="text-black">{{ text_post.numberOfLikes }}</span>
+                        {% endif %}
+                    </a>
+                </div>
+            </div>
+        {% endfor %}
+
+    </div>
+{% endblock %}

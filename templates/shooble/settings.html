@@ -1,0 +1,20 @@
+{% extends 'shooble/base.html' %}
+{% load crispy_forms_filters %}
+{% block body %}
+    <form action="{% url 'settings' %}" method="post">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <button class="btn btn-success" type="submit">Save Changes</button>
+    </form>
+{#    <p>To reset your password, please <a href="#">click here.</a></p>#}
+    <form action="{% url 'upload_pic' %}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ image_form|crispy }}
+        <button type="submit">Upload</button>
+    </form>
+
+    {% if img_obj %}
+        <h3>Succesfully uploaded : {{ img_obj.title }}</h3>
+        <img src="{{ img_obj.profile_pic.url }}" alt="connect" style="max-height:300px">
+    {% endif %}
+{% endblock %}

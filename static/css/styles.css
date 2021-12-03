@@ -1,0 +1,6 @@
+body{
+    background: -webkit-gradient(linear, left top, left bottom, from(#c7dbc1), to(white)) fixed;
+}
+textarea {
+  resize: none;
+}
