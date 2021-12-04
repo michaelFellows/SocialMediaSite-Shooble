@@ -5,9 +5,19 @@
         <div class="card-header">
             <div class="row">
                 <div class="col">
-                    <img class="img-fluid rounded-circle" height="60em" width="60em"
-                         src="{{ user_profile.profilepic_set.get.profile_pic.url }}" alt="">
-                    <h1><a href="{% url 'profile' user_profile.username %}">@{{ user_profile.username }}</a></h1>
+                    <div class="row">
+                        <div class="col-lg-2 m-auto me-0">
+                            <img class="img-fluid rounded-circle" height="60em" width="60em"
+                                 src="{{ user_profile.profilepic_set.get.profile_pic.url }}" alt="">
+                        </div>
+                        <div class="col-lg-10 py-3 ms-0">
+                            <p class="mb-0 lead">{{ user_profile.first_name }} {{ user_profile.last_name }}</p>
+                            <a class="text-muted"
+                               href="{% url 'profile' user_profile.username %}">@{{ user_profile.username }}</a>
+                        </div>
+                    </div>
+                    <p class="text-muted mb-0">Bio:</p>
+                    <p>{{ user_profile.userbio_set.get.bio }}</p>
                     {% if user.username != user_profile.username %}
                         {% if user_profile.id not in list_of_ids_being_followed %}
                             <a class="button btn-sm btn-success"
@@ -16,11 +26,12 @@
                             <a class="button btn-sm btn-danger" href="{% url 'unfollow' user_profile.username %}">Unfollow</a>
                         {% endif %}
                     {% endif %}
+                    <h2 class="lead">Followers: <a
+                            href="{% url 'is_followed_by' user_profile.username %}">{{ followers.count }}</a></h2>
+                    <h2 class="lead">Following: <a
+                            href="{% url 'is_following' user_profile.username %}">{{ following.count }}</a></h2>
                 </div>
-                <div class="col">
-                    <h2>Followers: <a href="#">{{ followers.count }}</a></h2>
-                    <h2>Following: <a href="#">{{ following.count }}</a></h2>
-                </div>
+
             </div>
         </div>
     </div>
@@ -31,6 +42,11 @@
             <h2 class="card-header lead display-4">Posts by {{ user_profile.username }}</h2>
         {% endif %}
         <div class="card-body">
+            {% if not text_posts %}
+                <h5 class="text-center fst-italic lead">It looks like you haven't posted yet</h5>
+                <h5 class="text-center fst-italic lead">Make your first post by going to your <a
+                        href="{% url 'index' %}">feed</a></h5>
+            {% endif %}
             {% for text_post in text_posts %}
                 <div id="like_button">
                     <div class="card p-1 my-3 rounded shadow">

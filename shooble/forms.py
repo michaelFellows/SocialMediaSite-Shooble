@@ -8,18 +8,6 @@ class UserForm(forms.ModelForm):
         model = User
         fields = ['first_name', 'last_name', 'email']
 
-        # widgets = {
-        #     'first_name': forms.TextInput(attrs={
-        #         'class': 'requiredField',
-        #     }),
-        #     'last_name': forms.TextInput(attrs={
-        #         'class': 'requiredField',
-        #     }),
-        #     'email': forms.EmailInput(attrs={
-        #         'class': 'requiredField',
-        #     }),
-        # }
-
 
 class ProfilePicForm(forms.ModelForm):
     class Meta:

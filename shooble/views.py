@@ -3,7 +3,7 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from .models import Following, Post, LikedPost, ProfilePic
+from .models import Following, Post, LikedPost, ProfilePic, UserBio
 from .forms import UserForm, ProfilePicForm
 
 
@@ -71,6 +71,7 @@ def register_view(request):
             user.email = request.POST.get('email')
             user.save()
             ProfilePic.objects.create(user=user, profile_pic='/images/defaultProfilePic.jpeg')
+            UserBio.objects.create(user=user, bio=user.username + " hasn't made a bio yet!")
             list_of_text_posts = Post.objects.all()
             for i in list_of_text_posts:
                 LikedPost.objects.create(user_liking=user, post=i, is_liked_by_user=False)
@@ -147,7 +148,7 @@ def profile_view(request, username):
         'following': list_of_following,
         'list_of_like_data': list_of_like_data,
         'list_of_ids_being_followed': list_of_ids_being_followed,
-        'profile_pic_url': profile_pic.profile_pic.url
+        'profile_pic_url': profile_pic.profile_pic.url,
     }
     print(text_posts)
     print(list_of_like_data)
@@ -243,10 +244,15 @@ def upload_profile_pic(request):
                 'img_obj': img_obj
             }
             return render(request, 'shooble/settings.html', context)
-    else:
-        image_form = ProfilePicForm()
-        form = UserForm(instance=request.user)
-    return render(request, 'shooble/settings.html', {'image_form': image_form, 'form:': form})
+    image_form = ProfilePicForm()
+    form = UserForm(instance=request.user)
+    print("banana")
+    print(form.fields)
+    context = {
+        'image_form': image_form,
+        'form': form
+    }
+    return render(request, 'shooble/settings.html', context)
 
 
 @login_required(login_url='login')
@@ -263,13 +269,40 @@ def delete_post(request, postID):
         return render(request, 'shooble/delete.html', context)
 
 
+@login_required(login_url='login')
 def create_bio(request):
-    # if request.method == 'POST':
-    #     bio = request.POST.get('textPost')
-    #     new_post = Post.objects.create(textBody=text_post, author=request.user)
-    #     list_of_users = User.objects.all()
-    #     for i in list_of_users:
-    #         print(i)
-    #         liked_post_object = LikedPost.objects.create(user_liking=i, post=new_post, is_liked_by_user=False)
-    #         print(liked_post_object)
-    return None
+    if request.method == 'POST':
+        bio = UserBio.objects.get(user=request.user)
+        bio.bio = request.POST.get('bio')
+        bio.save()
+        return redirect(request.META.get('HTTP_REFERER'))
+
+
+@login_required(login_url='login')
+def is_following(request, username):
+    user_profile = User.objects.get(username=username)
+    is_following_list = Following.objects.filter(userFollower=user_profile)
+    list_of_users_being_followed = []
+    for i in is_following_list:
+        list_of_users_being_followed.append(User.objects.get(id=i.userID_following))
+    context = {
+        'is_following_list': list_of_users_being_followed,
+        'user_being_checked': user_profile
+    }
+    return render(request, 'shooble/is-following.html', context)
+
+
+@login_required(login_url='login')
+def is_followed_by(request, username):
+    user_profile = User.objects.get(username=username)
+    is_followed_by_list = Following.objects.filter(userID_following=user_profile.id)
+    list_of_following = []
+    print(is_followed_by_list)
+    for i in is_followed_by_list:
+        list_of_following.append(User.objects.get(id=i.userFollower.id))
+    print(list_of_following)
+    context = {
+        'is_followed_by_list': list_of_following,
+        'user_being_checked': user_profile
+    }
+    return render(request, 'shooble/is-followed-by.html', context)

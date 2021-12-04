@@ -1,11 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
-from django.core.exceptions import ValidationError
 
 
 class Post(models.Model):
-    # userID = models.IntegerField()
-    # username = models.CharField(max_length=200, default=None)
     author = models.ForeignKey(User, on_delete=models.CASCADE, default=None)
     textBody = models.TextField(max_length=500)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -17,10 +14,7 @@ class Post(models.Model):
 
 class ProfilePic(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
-    # profile_pic = models.ImageField(upload_to='images', default='/images/defaultProfilePic.jpeg')
     profile_pic = models.ImageField(upload_to='images', default=None)
-
-    # title = models.CharField(max_length=200, default=None)
 
     def __str__(self):
         if self.user:
@@ -30,12 +24,8 @@ class ProfilePic(models.Model):
 
 
 class Following(models.Model):
-    # userID = models.IntegerField()
     userFollower = models.ForeignKey(User, on_delete=models.CASCADE, default=None)  # the user that is a follower
     userID_following = models.IntegerField()
-
-    # userFollowing = models.ForeignKey(User, on_delete=models.CASCADE, default=None)  # the user they are following
-    # userFollowingID = models.IntegerField()
 
     def __str__(self):
         return str(self.userFollower.username) + " is following " + str(self.userID_following)
@@ -57,3 +47,7 @@ class LikedPost(models.Model):
 class UserBio(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, default=None)
     bio = models.TextField(max_length=256, default=None)
+
+    def __str__(self):
+        return self.user.username + " bio"
+
