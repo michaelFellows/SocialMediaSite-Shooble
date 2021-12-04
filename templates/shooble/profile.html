@@ -8,7 +8,16 @@
                     <img class="img-fluid rounded-circle" height="60em" width="60em"
                          src="{{ user_profile.profilepic_set.get.profile_pic.url }}" alt="">
                     <h1><a href="{% url 'profile' user_profile.username %}">@{{ user_profile.username }}</a></h1>
+                    {% if user.username != user_profile.username %}
+                        {% if user_profile.id not in list_of_ids_being_followed %}
+                            <a class="button btn-sm btn-success"
+                               href="{% url 'follow' user_profile.username %}">Follow</a></li>
+                        {% else %}
+                            <a class="button btn-sm btn-danger" href="{% url 'unfollow' user_profile.username %}">Unfollow</a>
+                        {% endif %}
+                    {% endif %}
                 </div>
+
                 <div class="col">
                     <h2>Followers: <a href="#">{{ followers.count }}</a></h2>
                     <h2>Following: <a href="#">{{ following.count }}</a></h2>
@@ -16,13 +25,7 @@
             </div>
         </div>
     </div>
-    {% if user.username != user_profile.username %}
-        {% if user_profile.id not in list_of_ids_being_followed %}
-            <a href="{% url 'follow' user_profile.username %}">Follow</a></li>
-        {% else %}
-            <a href="{% url 'unfollow' user_profile.username %}">Unfollow</a>
-        {% endif %}
-    {% endif %}
+
     <div class="card mt-3">
         {% if user.username == user_profile.username %}
             <h2 class="card-header lead display-4">My Posts</h2>
@@ -71,8 +74,25 @@
                                         </svg>
                                         <span class="text-black">{{ text_post.numberOfLikes }}</span>
                                     {% endif %}
+
                                 </button>
                             </form>
+                            {% if user.username == user_profile.username %}
+                                <div class="row">
+                                    <div class="col text-start">
+                                        <a class="button btn-danger btn-sm" href="{% url 'delete_post' text_post.id %}">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                                 fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                                                <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                                                <path fill-rule="evenodd"
+                                                      d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                                            </svg>
+                                            Delete Post
+                                        </a>
+                                    </div>
+                                </div>
+
+                            {% endif %}
                         </div>
                     </div>
                 </div>

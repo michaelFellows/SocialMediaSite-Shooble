@@ -11,15 +11,9 @@ from .forms import UserForm, ProfilePicForm
 @login_required(login_url='login')
 def index(request):
     users_being_followed = Following.objects.filter(userFollower=request.user)
-    # print(users_being_followed)
     text_posts = []
     list_of_like_data = []
     ordered_text_posts = Post.objects.order_by('created_at')
-    # ordered_like_data = LikedPost.objects.order_by('post__created_at').filter(user_liking=request.user).exclude(
-    #     post__author=request.user)
-    # ordered_like_data.reverse()
-    # print(ordered_like_data)
-    # print(ordered_like_data)
     counter = 0
     for i in ordered_text_posts:
         for j in users_being_followed:
@@ -29,22 +23,13 @@ def index(request):
                     i.likedpost_set.filter(user_liking=request.user, post=i).get().is_liked_by_user)
                 text_posts.append(i)
                 counter += 1
-    # I NEED TO GET THE THE TRUE OR FALSE VALUE FOR WHETHER OR NOT THE REQUEST.USER HAS LIKED THE CURRENT TEXTPOST
-    # EACH TEXT POST HAS A LIKEDPOST OBJECT FOR EVERY USER
-    # EACH LIKEDPOST OBJECT HAS IS_LIKED
     text_posts.reverse()
     list_of_like_data.reverse()
     print(list_of_like_data)
-
-    # for k in list_of_like_data:
-    #     print(list_of_like_data[k])
     context = {
         'text_posts': text_posts,
         'list_of_like_data': list_of_like_data
     }
-    # print(context)
-    # print(text_posts)
-    # print(list_of_like_data)
     return render(request, "shooble/index.html", context)
 
 
@@ -130,7 +115,6 @@ def search_shooble(request):
                 'search_query': search_query
             }
         return render(request, 'shooble/search.html', context)
-        # return redirect(request.META.get('HTTP_REFERER'))
     return render(request, 'shooble/search.html')
 
 
@@ -156,7 +140,6 @@ def profile_view(request, username):
         text_posts.append(i)
         list_of_like_data.append(i.likedpost_set.filter(user_liking=request.user, post=i).get().is_liked_by_user)
         counter += 1
-
     text_posts.reverse()
     list_of_like_data.reverse()
     context = {
@@ -168,8 +151,6 @@ def profile_view(request, username):
         'list_of_ids_being_followed': list_of_ids_being_followed,
         'profile_pic_url': profile_pic.profile_pic.url
     }
-    # print(text_posts)
-    # print(searched_user)
     print(text_posts)
     print(list_of_like_data)
     print(ordered_like_data)
@@ -186,7 +167,6 @@ def follow_user(request, username):
     context = {
         'user_profile': user_to_follow
     }
-    # return render(request, 'shooble/profile.html', context)
     return redirect(request.META.get('HTTP_REFERER'), context)
 
 
@@ -194,27 +174,25 @@ def follow_user(request, username):
 def unfollow_user(request, username):
     user_to_unfollow = User.objects.get(username=username)
     userID_to_unfollow = user_to_unfollow.id
-    # unfollow = Following.objects.get(userID=request.user.id, userID_following=userID_to_unfollow)
     unfollow = Following.objects.get(userFollower=request.user, userID_following=userID_to_unfollow)
     if unfollow:
         unfollow.delete()
     return redirect(request.META.get('HTTP_REFERER'))
 
 
+@login_required(login_url='login')
 def settings_view(request):
     print("reached the settings view")
     if request.method == 'POST':
         form = UserForm(request.POST)
         print(form)
-        # if form.is_valid():
-        print("form is valid")
-        user = User.objects.get(username=request.user.username)
-        user.first_name = request.POST.get('first_name')
-        user.last_name = request.POST.get('last_name')
-        # user.username = form.username
-        user.email = request.POST.get('email')
-        user.save()
-        return redirect('settings')
+        if form.is_valid():
+            user = User.objects.get(username=request.user.username)
+            user.first_name = request.POST.get('first_name')
+            user.last_name = request.POST.get('last_name')
+            user.email = request.POST.get('email')
+            user.save()
+            return redirect('settings')
     form = UserForm(instance=request.user)
     context = {
         'form': form
@@ -222,12 +200,11 @@ def settings_view(request):
     return render(request, 'shooble/settings.html', context)
 
 
+@login_required(login_url='login')
 def like_post(request, postID):
-    # if request.method == 'POST':
     if request.is_ajax():
         print("ajax request received")
         post_being_liked = Post.objects.get(id=postID)
-        # if the user has not already liked the post
         liked_post_object = LikedPost.objects.get(user_liking=request.user, post=post_being_liked)
         if not liked_post_object.is_liked_by_user:
             post_being_liked.numberOfLikes += 1
@@ -235,9 +212,7 @@ def like_post(request, postID):
             post_being_liked.save()
             liked_post_object.save()
             print(post_being_liked)
-            # return redirect('index')
             return redirect(request.META.get('HTTP_REFERER'))
-            # return HttpResponse(0)
         else:
             post_being_liked.numberOfLikes -= 1
             liked_post_object.is_liked_by_user = False
@@ -245,9 +220,6 @@ def like_post(request, postID):
             liked_post_object.save()
             print(post_being_liked)
             return redirect(request.META.get('HTTP_REFERER'))
-        # return redirect('index')
-        # return redirect(request.META.get('HTTP_REFERER'))
-    # return redirect(request.META.get('HTTP_REFERER'))
     return redirect(request.META.get('HTTP_REFERER'))
 
 
@@ -259,10 +231,8 @@ def upload_profile_pic(request):
         print("made it past the image form")
         if image_form.is_valid():
             image_form.save()
-            # Get the current instance object to display in the template
             old_image = ProfilePic.objects.get(user=request.user)
             old_image.delete()
-
             img_obj = image_form.instance
             img_obj.user = request.user
             img_obj.save()
@@ -275,3 +245,32 @@ def upload_profile_pic(request):
     else:
         image_form = ProfilePicForm()
     return render(request, 'shooble/settings.html', {'image_form': image_form})
+
+
+@login_required(login_url='login')
+def delete_post(request, postID):
+    post_to_delete = Post.objects.get(id=postID)
+    if post_to_delete.author_id == request.user.id:
+        context = {
+            'user_profile': request.user
+        }
+        if request.method == "POST":
+            post_to_delete.delete()
+            return redirect('/profile/' + request.user.username)
+        context = {
+            'text_post': post_to_delete,
+            'user_profile': request.user
+        }
+        return render(request, 'shooble/delete.html', context)
+
+
+def create_bio(request):
+    # if request.method == 'POST':
+    #     bio = request.POST.get('textPost')
+    #     new_post = Post.objects.create(textBody=text_post, author=request.user)
+    #     list_of_users = User.objects.all()
+    #     for i in list_of_users:
+    #         print(i)
+    #         liked_post_object = LikedPost.objects.create(user_liking=i, post=new_post, is_liked_by_user=False)
+    #         print(liked_post_object)
+    return None

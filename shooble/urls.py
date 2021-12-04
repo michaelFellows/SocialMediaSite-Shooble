@@ -13,5 +13,7 @@ urlpatterns = [
     path('unfollow/<str:username>', views.unfollow_user, name="unfollow"),
     path('settings/', views.settings_view, name="settings"),
     path('liked/<str:postID>', views.like_post, name="like_post"),
-    path('upload/', views.upload_profile_pic, name="upload_pic")
+    path('upload/', views.upload_profile_pic, name="upload_pic"),
+    path('delete/<str:postID>', views.delete_post, name="delete_post"),
+    path('create-bio/', views.create_bio, name="create_bio")
 ]

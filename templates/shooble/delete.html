@@ -1,0 +1,35 @@
+{% extends 'shooble/base.html' %}
+{% load index_filter %}
+{% block body %}
+    <div class="card">
+        <div class="card-header">Delete Post</div>
+        <div class="card-body">
+            <h5>Are you sure you want to delete your post?</h5>
+            <div class="card p-1 my-3 rounded shadow">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-1 m-auto me-0">
+                            <img class="img-fluid rounded-circle" height="60em" width="60em"
+                                 src="{{ text_post|get_profile_pic }}" alt="">
+                        </div>
+                        <div class="col-lg-11 py-3 ms-0">
+                            <p class="mb-0 lead">{{ text_post.author.first_name }} {{ text_post.author.last_name }}</p>
+                            <a class="text-muted"
+                               href="{% url 'profile' text_post.author.username %}">@{{ text_post.author.username }}</a>
+                        </div>
+
+                    </div>
+                    <p class="card-text">{{ text_post.textBody }}</p>
+                    <p class="card-text text-secondary">{{ text_post.created_at }}</p>
+                </div>
+            </div>
+            <form action="" method="post">
+                {% csrf_token %}
+                <a class="btn btn-info text-white" href="{% url 'profile' user.username %}">No, go back</a>
+                <button class="btn btn-danger" type="submit" id="button-addon2">Yes, delete</button>
+            </form>
+        </div>
+
+
+    </div>
+{% endblock %}

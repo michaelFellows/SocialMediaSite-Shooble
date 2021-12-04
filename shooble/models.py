@@ -7,7 +7,7 @@ class Post(models.Model):
     # userID = models.IntegerField()
     # username = models.CharField(max_length=200, default=None)
     author = models.ForeignKey(User, on_delete=models.CASCADE, default=None)
-    textBody = models.TextField()
+    textBody = models.TextField(max_length=500)
     created_at = models.DateTimeField(auto_now_add=True)
     numberOfLikes = models.IntegerField(default=0)
 
@@ -53,5 +53,7 @@ class LikedPost(models.Model):
             liked = " has not liked "
         return str(self.user_liking) + liked + str(self.post) + " by " + str(self.post.author.username)
 
-# class UserBio(models.Model):
 
+class UserBio(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, default=None)
+    bio = models.TextField(max_length=256, default=None)
