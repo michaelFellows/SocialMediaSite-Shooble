@@ -1,4 +1,3 @@
-from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import login, logout
@@ -18,7 +17,6 @@ def index(request):
     for i in ordered_text_posts:
         for j in users_being_followed:
             if i.author.id == j.userID_following:
-                # list_of_like_data.append(ordered_like_data[counter])
                 list_of_like_data.append(
                     i.likedpost_set.filter(user_liking=request.user, post=i).get().is_liked_by_user)
                 text_posts.append(i)
@@ -226,8 +224,10 @@ def like_post(request, postID):
 @login_required(login_url='login')
 def upload_profile_pic(request):
     """Process images uploaded by users"""
+
     if request.method == 'POST':
         image_form = ProfilePicForm(request.POST, request.FILES)
+        form = UserForm(instance=request.user)
         print("made it past the image form")
         if image_form.is_valid():
             image_form.save()
@@ -239,21 +239,20 @@ def upload_profile_pic(request):
             print(img_obj)
             context = {
                 'image_form': image_form,
+                'form': form,
                 'img_obj': img_obj
             }
             return render(request, 'shooble/settings.html', context)
     else:
         image_form = ProfilePicForm()
-    return render(request, 'shooble/settings.html', {'image_form': image_form})
+        form = UserForm(instance=request.user)
+    return render(request, 'shooble/settings.html', {'image_form': image_form, 'form:': form})
 
 
 @login_required(login_url='login')
 def delete_post(request, postID):
     post_to_delete = Post.objects.get(id=postID)
     if post_to_delete.author_id == request.user.id:
-        context = {
-            'user_profile': request.user
-        }
         if request.method == "POST":
             post_to_delete.delete()
             return redirect('/profile/' + request.user.username)

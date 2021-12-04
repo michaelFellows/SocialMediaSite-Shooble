@@ -17,7 +17,6 @@
                         {% endif %}
                     {% endif %}
                 </div>
-
                 <div class="col">
                     <h2>Followers: <a href="#">{{ followers.count }}</a></h2>
                     <h2>Following: <a href="#">{{ following.count }}</a></h2>
@@ -25,14 +24,12 @@
             </div>
         </div>
     </div>
-
     <div class="card mt-3">
         {% if user.username == user_profile.username %}
             <h2 class="card-header lead display-4">My Posts</h2>
         {% else %}
             <h2 class="card-header lead display-4">Posts by {{ user_profile.username }}</h2>
         {% endif %}
-
         <div class="card-body">
             {% for text_post in text_posts %}
                 <div id="like_button">
@@ -48,7 +45,6 @@
                                     <a class="text-muted"
                                        href="{% url 'profile' text_post.author.username %}">@{{ text_post.author.username }}</a>
                                 </div>
-
                             </div>
                             <p class="card-text">{{ text_post.textBody }}</p>
                             <p class="card-text text-secondary">{{ text_post.created_at }}</p>
@@ -56,9 +52,7 @@
                                   action="{% url 'like_post' text_post.id %}">
                                 {% csrf_token %}
                                 <button class="btn like-button-text" type="submit">
-                                    {#                                                    {{ list_of_like_data|index:forloop.counter0|get_liked }}#}
                                     {% if not list_of_like_data|index:forloop.counter0 %}
-                                        {#                                    {% if not text_post||user_has_liked %}#}
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
                                              fill="currentColor"
                                              class="bi bi-heart" viewBox="0 0 16 16">
@@ -74,7 +68,6 @@
                                         </svg>
                                         <span class="text-black">{{ text_post.numberOfLikes }}</span>
                                     {% endif %}
-
                                 </button>
                             </form>
                             {% if user.username == user_profile.username %}
@@ -91,28 +84,12 @@
                                         </a>
                                     </div>
                                 </div>
-
                             {% endif %}
                         </div>
                     </div>
                 </div>
-
             {% endfor %}
         </div>
     </div>
 
-    <script>
-        $("form.like_button_class").on("submit", function (e) {
-            let dataString = $(this).serialize();
-            let user_id = $(this).closest("form.like_button_class").attr('id');
-            $.ajax({
-                type: "POST",
-                url: "/liked/" + user_id,
-                data: dataString,
-            });
-            e.preventDefault();
-            $("#like_button").load(location.href + " #like_button");
-            window.location.reload()
-        });
-    </script>
 {% endblock %}
