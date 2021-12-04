@@ -26,6 +26,7 @@ def index(request):
             if i.author.id == j.userID_following:
                 list_of_like_data.append(ordered_like_data[counter])
                 text_posts.append(i)
+                print(i.author.profilepic_set.get().profile_pic.url)
                 counter += 1
 
     text_posts.reverse()
@@ -82,6 +83,7 @@ def register_view(request):
             user.last_name = request.POST.get('last_name')
             user.email = request.POST.get('email')
             user.save()
+            ProfilePic.objects.create(user=user, profile_pic='/images/defaultProfilePic')
             list_of_text_posts = Post.objects.all()
             for i in list_of_text_posts:
                 LikedPost.objects.create(user_liking=user, post=i, is_liked_by_user=False)
@@ -106,7 +108,7 @@ def logout_view(request):
 def search_shooble(request):
     if request.method == 'POST':
         search_query = request.POST.get('search')
-        users_searched = User.objects.filter(username__contains=search_query)
+        users_searched = User.objects.filter(username__contains=search_query).exclude(username=request.user.username)
         users_being_followed = Following.objects.filter(userFollower=request.user)
         list_of_ids_being_followed = []
         for i in list(users_being_followed):
@@ -138,7 +140,7 @@ def profile_view(request, username):
     ordered_text_posts = Post.objects.filter(author=searched_user).order_by('created_at')
     ordered_like_data = LikedPost.objects.order_by('post__created_at').filter(user_liking=request.user,
                                                                               post__author=searched_user)
-    profile_pic = ProfilePic.objects.get(user=request.user)
+    profile_pic = ProfilePic.objects.get(user=searched_user)
     users_being_followed = Following.objects.filter(userFollower=request.user)
     list_of_ids_being_followed = []
     for i in list(users_being_followed):
@@ -254,6 +256,9 @@ def upload_profile_pic(request):
         if image_form.is_valid():
             image_form.save()
             # Get the current instance object to display in the template
+            old_image = ProfilePic.objects.get(user=request.user)
+            old_image.delete()
+
             img_obj = image_form.instance
             img_obj.user = request.user
             img_obj.save()

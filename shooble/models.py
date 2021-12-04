@@ -16,7 +16,8 @@ class Post(models.Model):
 
 class ProfilePic(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
-    profile_pic = models.ImageField(upload_to='images')
+    # profile_pic = models.ImageField(upload_to='images', default='/images/defaultProfilePic.jpeg')
+    profile_pic = models.ImageField(upload_to='images', default=None)
     # title = models.CharField(max_length=200, default=None)
 
     def __str__(self):
