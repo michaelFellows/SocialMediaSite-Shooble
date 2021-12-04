@@ -16,7 +16,7 @@
         <h2 class="my-3">My Feed</h2>
         {% for text_post in text_posts %}
             <div id="like_button">
-                <div class="card p-1 my-3 rounded shadow" id="{{ text_post.id }}">
+                <div class="card p-1 my-3 rounded shadow">
                     <div class="card-body">
                         <div class="row">
                             <div class="col-lg-1 m-auto">
@@ -31,23 +31,26 @@
                         </div>
                         <p class="card-text">{{ text_post.textBody }}</p>
                         <p class="card-text text-secondary">{{ text_post.created_at }}</p>
-                        <a class="btn" href="{% url 'like_post' text_post.id %}">
-                            {#                    {{ list_of_like_data|index:forloop.counter0|get_liked }}#}
-                            {% if not list_of_like_data|index:forloop.counter0|get_liked %}
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                                     class="bi bi-heart" viewBox="0 0 16 16">
-                                    <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"/>
-                                </svg>
-                                {{ text_post.numberOfLikes }}
-                            {% else %}
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                                     class="text-danger bi bi-heart-fill" viewBox="0 0 16 16">
-                                    <path fill-rule="evenodd"
-                                          d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z"/>
-                                </svg>
-                                <span class="text-black">{{ text_post.numberOfLikes }}</span>
-                            {% endif %}
-                        </a>
+                        <form method="post" id="{{ text_post.id }}" action="{% url 'like_post' text_post.id %}">
+                            {% csrf_token %}
+                            <button class="btn" type="submit">
+                                {#                    {{ list_of_like_data|index:forloop.counter0|get_liked }}#}
+                                {% if not list_of_like_data|index:forloop.counter0|get_liked %}
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                         class="bi bi-heart" viewBox="0 0 16 16">
+                                        <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"/>
+                                    </svg>
+                                    {{ text_post.numberOfLikes }}
+                                {% else %}
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                         class="text-danger bi bi-heart-fill" viewBox="0 0 16 16">
+                                        <path fill-rule="evenodd"
+                                              d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z"/>
+                                    </svg>
+                                    <span class="text-black">{{ text_post.numberOfLikes }}</span>
+                                {% endif %}
+                            </button>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -56,36 +59,44 @@
     </div>
 
     <script>
-        {#$("#like_button").addEventListener("click", function (e) {#}
-        {##}
-        {#    let dataString = $(this).serialize();#}
-        {#    console.log(dataString)#}
-        {##}
-        {#    alert(dataString); return false;#}
-        {##}
-        {#    $.ajax({#}
-        {#        type: "POST",#}
-        {#        url: "bin/process.php",#}
-        {#        data: dataString,#}
-        {#        success: function () {#}
-        {#            console.log("like button pressed successfully")#}
-        {#$("#contact_form").html("<div id='message'></div>");#}
-        {#$("#message")#}
-        {#    .html("<h2>Contact Form Submitted!</h2>")#}
-        {#    .append("<p>We will be in touch soon.</p>")#}
-        {#    .hide()#}
-        {#    .fadeIn(1500, function () {#}
-        {#        $("#message").append(#}
-        {#            "<img id='checkmark' src='images/check.png' />"#}
-        {#        );#}
-        {#    });#}
-        {#        }#}
-        {#    });#}
-        {#    e.preventDefault();#}
-        {#);#}
-        $('#like_button').click(function () {
-            console.log("bruh")
-            location.reload();
+        $("form").on("submit", function (e) {
+
+            let dataString = $(this).serialize();
+            let user_id = $(this).closest("form").attr('id');
+            console.log(user_id);
+            {#console.log({% url 'like_post' 37 %});#}
+
+             {#alert(dataString); return false;#}
+
+            $.ajax({
+                type: "POST",
+                //url: "bin/process.php",
+                url: "/liked/"+user_id,
+                data: dataString,
+
+                /*
+                success: function () {
+                    $("#contact_form").html("<div id='message'></div>");
+                    $("#message")
+                        .html("<h2>Contact Form Submitted!</h2>")
+                        .append("<p>We will be in touch soon.</p>")
+                        .hide()
+                        .fadeIn(1500, function () {
+                            $("#message").append(
+                                "<img id='checkmark' src='images/check.png' />"
+                            );
+                        });
+                }*/
+
+            });
+            console.log("banana!")
+            {#return false;#}
+
+            e.preventDefault();
+            $("#like_button").load(location.href + " #like_button");
+            window.location.reload()
+            {#return false;#}
         });
+
     </script>
 {% endblock %}

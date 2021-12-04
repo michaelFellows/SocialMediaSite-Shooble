@@ -217,25 +217,31 @@ def settings_view(request):
 
 
 def like_post(request, postID):
-    post_being_liked = Post.objects.get(id=postID)
-    # if the user has not already liked the post
-    liked_post_object = LikedPost.objects.get(user_liking=request.user, post=post_being_liked)
-    if not liked_post_object.is_liked_by_user:
-        post_being_liked.numberOfLikes += 1
-        liked_post_object.is_liked_by_user = True
-        post_being_liked.save()
-        liked_post_object.save()
-        print(post_being_liked)
+    # if request.method == 'POST':
+    if request.is_ajax():
+        print("ajax request received")
+        post_being_liked = Post.objects.get(id=postID)
+        # if the user has not already liked the post
+        liked_post_object = LikedPost.objects.get(user_liking=request.user, post=post_being_liked)
+        if not liked_post_object.is_liked_by_user:
+            post_being_liked.numberOfLikes += 1
+            liked_post_object.is_liked_by_user = True
+            post_being_liked.save()
+            liked_post_object.save()
+            print(post_being_liked)
+            # return redirect('index')
+            return redirect(request.META.get('HTTP_REFERER'))
+            # return HttpResponse(0)
+        else:
+            post_being_liked.numberOfLikes -= 1
+            liked_post_object.is_liked_by_user = False
+            post_being_liked.save()
+            liked_post_object.save()
+            print(post_being_liked)
+            return redirect(request.META.get('HTTP_REFERER'))
         # return redirect('index')
-        return redirect(request.META.get('HTTP_REFERER'))
-        # return HttpResponse(0)
-    else:
-        post_being_liked.numberOfLikes -= 1
-        liked_post_object.is_liked_by_user = False
-        post_being_liked.save()
-        liked_post_object.save()
-        print(post_being_liked)
-    # return redirect('index')
+        # return redirect(request.META.get('HTTP_REFERER'))
+    # return redirect(request.META.get('HTTP_REFERER'))
     return redirect(request.META.get('HTTP_REFERER'))
 
 
