@@ -87,7 +87,7 @@ def register_view(request):
             user.last_name = request.POST.get('last_name')
             user.email = request.POST.get('email')
             user.save()
-            ProfilePic.objects.create(user=user, profile_pic='/images/defaultProfilePic')
+            ProfilePic.objects.create(user=user, profile_pic='/images/defaultProfilePic.jpeg')
             list_of_text_posts = Post.objects.all()
             for i in list_of_text_posts:
                 LikedPost.objects.create(user_liking=user, post=i, is_liked_by_user=False)
@@ -154,7 +154,7 @@ def profile_view(request, username):
     counter = 0
     for i in ordered_text_posts:
         text_posts.append(i)
-        list_of_like_data.append(ordered_like_data[counter])
+        list_of_like_data.append(i.likedpost_set.filter(user_liking=request.user, post=i).get().is_liked_by_user)
         counter += 1
 
     text_posts.reverse()

@@ -6,11 +6,22 @@
         {{ form|crispy }}
         <button class="btn btn-success" type="submit">Save Changes</button>
     </form>
-{#    <p>To reset your password, please <a href="#">click here.</a></p>#}
+    <div class="bg-white rounded shadow">
+            <div class="row">
+                <form class="input-group" action="{% url 'create' %}" method="post">
+                    {% csrf_token %}
+                    <textarea class="form-control" name="textPost" id="exampleFormControlTextarea1" rows="3"
+                              placeholder="Update your bio..."></textarea>
+                    <button class="d-flex btn btn-success py-4" type="submit" id="button-addon2">Post</button>
+                </form>
+            </div>
+        </div>
+    <p>To reset your password, please <a target="_blank" href="/admin/password-change">click here.</a></p>
     <form action="{% url 'upload_pic' %}" method="post" name="image" enctype="multipart/form-data">
         {% csrf_token %}
+        <p class="mb-0 mt-3">Upload a profile picture</p>
         {{ image_form|crispy }}
-        <button type="submit">Upload</button>
+        <button class="btn btn-success" type="submit">Upload</button>
     </form>
 
     {% if img_obj %}

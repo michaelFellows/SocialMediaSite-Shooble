@@ -1,6 +1,28 @@
-body{
+body {
     background: -webkit-gradient(linear, left top, left bottom, from(#c7dbc1), to(white)) fixed;
 }
+
 textarea {
-  resize: none;
+    resize: none;
+}
+
+search-button{
+    color: #03fc62
+}
+
+.dark{
+    background: #151715;
+    color: white;
+}
+
+.dark-card{
+    background: #1b1f1b;
+}
+
+.dark-card-feed{
+    background: #222622;
+}
+
+.light-card{
+    background: white;
 }

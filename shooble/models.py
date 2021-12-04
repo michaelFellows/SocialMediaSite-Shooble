@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 
 
 class Post(models.Model):
@@ -18,6 +19,7 @@ class ProfilePic(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     # profile_pic = models.ImageField(upload_to='images', default='/images/defaultProfilePic.jpeg')
     profile_pic = models.ImageField(upload_to='images', default=None)
+
     # title = models.CharField(max_length=200, default=None)
 
     def __str__(self):
@@ -50,3 +52,6 @@ class LikedPost(models.Model):
         else:
             liked = " has not liked "
         return str(self.user_liking) + liked + str(self.post) + " by " + str(self.post.author.username)
+
+# class UserBio(models.Model):
+

@@ -1,7 +1,12 @@
 {% extends 'shooble/base.html' %}
 {% load index_filter %}
+{% load static %}
 {% block body %}
-    <h1>Welcome {{ user.username }}</h1>
+    <div class="row">
+        <div class="col text-center">
+            <img class="img-fluid mb-3 logo" height="250em" width="250em" src="" alt=""></div>
+    </div>
+
     <div class="mb-3">
         <div class="bg-white rounded shadow">
             <div class="row">
@@ -13,64 +18,79 @@
                 </form>
             </div>
         </div>
-        <h2 class="my-3">My Feed</h2>
-        {% for text_post in text_posts %}
-            <div id="like_button">
-                <div class="card p-1 my-3 rounded shadow">
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-lg-1 m-auto">
-                                <img class="img-fluid rounded-circle" src="{{ text_post|get_profile_pic}}" alt="">
-                            </div>
-                            <div class="col-lg-11 py-3 ms-0">
-                                <p class="mb-0 lead">{{ text_post.author.first_name }} {{ text_post.author.last_name }}</p>
-                                <a class="text-muted"
-                                   href="{% url 'profile' text_post.author.username %}">@{{ text_post.author.username }}</a>
-                            </div>
+        <div class="card mt-3">
+            <h2 class="card-header lead display-4">My Feed</h2>
+            <div class="card-body">
+                {% if not text_posts %}
+                    <h5 class="text-center fst-italic lead">It looks like you're not following anybody</h5>
+                    <h5 class="text-center fst-italic lead"><a href="{% url 'search' %}">Search</a> for other Shooblers
+                        to see posts on your feed!</h5>
+                {% endif %}
+                {% for text_post in text_posts %}
+                    <div id="like_button">
+                        <div class="card content-card p-1 my-3 rounded shadow">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-lg-1 m-auto me-0">
+                                        <img class="img-fluid rounded-circle" height="60em" width="60em"
+                                             src="{{ text_post|get_profile_pic }}" alt="">
+                                    </div>
+                                    <div class="col-lg-11 py-3 ms-0">
+                                        <p class="mb-0 lead">{{ text_post.author.first_name }} {{ text_post.author.last_name }}</p>
+                                        <a class="text-muted"
+                                           href="{% url 'profile' text_post.author.username %}">@{{ text_post.author.username }}</a>
+                                    </div>
 
+                                </div>
+                                <p class="card-text">{{ text_post.textBody }}</p>
+                                <p class="card-text text-secondary">{{ text_post.created_at }}</p>
+                                <form method="post" class="like_button_class" id="{{ text_post.id }}"
+                                      action="{% url 'like_post' text_post.id %}">
+                                    {% csrf_token %}
+                                    <button class="btn like-button-text" type="submit">
+                                        {#                                                    {{ list_of_like_data|index:forloop.counter0|get_liked }}#}
+                                        {% if not list_of_like_data|index:forloop.counter0 %}
+                                            {#                                    {% if not text_post||user_has_liked %}#}
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                                 fill="currentColor"
+                                                 class="bi bi-heart" viewBox="0 0 16 16">
+                                                <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"/>
+                                            </svg>
+                                            {{ text_post.numberOfLikes }}
+                                        {% else %}
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                                 fill="currentColor"
+                                                 class="text-danger bi bi-heart-fill" viewBox="0 0 16 16">
+                                                <path fill-rule="evenodd"
+                                                      d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z"/>
+                                            </svg>
+                                            <span class="text-black">{{ text_post.numberOfLikes }}</span>
+                                        {% endif %}
+                                    </button>
+                                </form>
+                            </div>
                         </div>
-                        <p class="card-text">{{ text_post.textBody }}</p>
-                        <p class="card-text text-secondary">{{ text_post.created_at }}</p>
-                        <form method="post" class="like_button_class" id="{{ text_post.id }}" action="{% url 'like_post' text_post.id %}">
-                            {% csrf_token %}
-                            <button class="btn" type="submit">
-{#                                                    {{ list_of_like_data|index:forloop.counter0|get_liked }}#}
-                                {% if not list_of_like_data|index:forloop.counter0 %}
-{#                                    {% if not text_post||user_has_liked %}#}
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                                         class="bi bi-heart" viewBox="0 0 16 16">
-                                        <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"/>
-                                    </svg>
-                                    {{ text_post.numberOfLikes }}
-                                {% else %}
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                                         class="text-danger bi bi-heart-fill" viewBox="0 0 16 16">
-                                        <path fill-rule="evenodd"
-                                              d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z"/>
-                                    </svg>
-                                    <span class="text-black">{{ text_post.numberOfLikes }}</span>
-                                {% endif %}
-                            </button>
-                        </form>
                     </div>
-                </div>
+                {% endfor %}
             </div>
+        </div>
 
-        {% endfor %}
     </div>
 
     <script>
+
         $("form.like_button_class").on("submit", function (e) {
             let dataString = $(this).serialize();
             let user_id = $(this).closest("form.like_button_class").attr('id');
             $.ajax({
                 type: "POST",
-                url: "/liked/"+user_id,
+                url: "/liked/" + user_id,
                 data: dataString,
             });
             e.preventDefault();
             $("#like_button").load(location.href + " #like_button");
             window.location.reload()
         });
+
     </script>
 {% endblock %}
