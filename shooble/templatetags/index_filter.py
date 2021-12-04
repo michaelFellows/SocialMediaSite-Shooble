@@ -16,3 +16,8 @@ def get_liked(list1):
 @register.filter()
 def get_profile_pic(text_post):
     return text_post.author.profilepic_set.get().profile_pic.url
+
+
+@register.filter()
+def user_has_liked(index_of_text_posts, user):
+    return index_of_text_posts.likedpost_set.filter(user_liking=user, post=index_of_text_posts)

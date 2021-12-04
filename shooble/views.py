@@ -11,26 +11,30 @@ from .forms import UserForm, ProfilePicForm
 @login_required(login_url='login')
 def index(request):
     users_being_followed = Following.objects.filter(userFollower=request.user)
-    print(users_being_followed)
+    # print(users_being_followed)
     text_posts = []
     list_of_like_data = []
     ordered_text_posts = Post.objects.order_by('created_at')
-    ordered_like_data = LikedPost.objects.order_by('post__created_at').filter(user_liking=request.user).exclude(
-        post__author=request.user)
+    # ordered_like_data = LikedPost.objects.order_by('post__created_at').filter(user_liking=request.user).exclude(
+    #     post__author=request.user)
     # ordered_like_data.reverse()
-    print(ordered_like_data)
+    # print(ordered_like_data)
     # print(ordered_like_data)
     counter = 0
     for i in ordered_text_posts:
         for j in users_being_followed:
             if i.author.id == j.userID_following:
-                list_of_like_data.append(ordered_like_data[counter])
+                # list_of_like_data.append(ordered_like_data[counter])
+                list_of_like_data.append(
+                    i.likedpost_set.filter(user_liking=request.user, post=i).get().is_liked_by_user)
                 text_posts.append(i)
-                print(i.author.profilepic_set.get().profile_pic.url)
                 counter += 1
-
+    # I NEED TO GET THE THE TRUE OR FALSE VALUE FOR WHETHER OR NOT THE REQUEST.USER HAS LIKED THE CURRENT TEXTPOST
+    # EACH TEXT POST HAS A LIKEDPOST OBJECT FOR EVERY USER
+    # EACH LIKEDPOST OBJECT HAS IS_LIKED
     text_posts.reverse()
     list_of_like_data.reverse()
+    print(list_of_like_data)
 
     # for k in list_of_like_data:
     #     print(list_of_like_data[k])
@@ -39,8 +43,8 @@ def index(request):
         'list_of_like_data': list_of_like_data
     }
     # print(context)
-    print(text_posts)
-    print(list_of_like_data)
+    # print(text_posts)
+    # print(list_of_like_data)
     return render(request, "shooble/index.html", context)
 
 
