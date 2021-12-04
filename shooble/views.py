@@ -12,7 +12,16 @@ def index(request):
     users_being_followed = Following.objects.filter(userFollower=request.user)
     text_posts = []
     list_of_like_data = []
+    # list_of_all_posts = []
     ordered_text_posts = Post.objects.order_by('created_at')
+    # # To get top 3 trending users:
+    # # Get the number of likes on each post for every user
+    # list_of_all_users = User.objects.all()
+    # for i in list_of_all_users:
+    #     print(i)
+    #     list_of_all_posts.append(Post.objects.filter(author=i))
+    # # Sort from high to low and only display index 0-2 on the homepage
+    # print(list_of_all_posts)
     counter = 0
     for i in ordered_text_posts:
         for j in users_being_followed:
