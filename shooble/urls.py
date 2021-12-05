@@ -17,5 +17,6 @@ urlpatterns = [
     path('delete/<str:postID>', views.delete_post, name="delete_post"),
     path('create-bio/', views.create_bio, name="create_bio"),
     path('is-following/<str:username>', views.is_following, name="is_following"),
-    path('is-followed-by/<str:username>', views.is_followed_by, name='is_followed_by')
+    path('is-followed-by/<str:username>', views.is_followed_by, name='is_followed_by'),
+    path('make-comment/<str:postID>', views.make_comment, name='make_comment')
 ]

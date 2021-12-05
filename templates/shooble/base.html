@@ -46,7 +46,7 @@
                         <a class="nav-link active" href="{% url 'login' %}">Login</a>
                     </li>
                 {% endif %}
-                <li class="nav-item d-inline-flex">
+                <li class="nav-item d-inline-flex ms-2">
                     <button class=" rounded dark-mode-switch button btn-dark">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                              class="bi bi-moon-fill" viewBox="0 0 16 16">
@@ -54,6 +54,9 @@
                         </svg>
                         <span class="change"></span></button>
                 </li>
+            <li class="nav-item d-inline-flex ms-2">
+                <a href="{% url 'search' %}" class="btn btn-success border border-white">Explore all Shooblers</a>
+            </li>
             </ul>
             <div class="navbar-nav ms-auto">
                 {% if user.is_authenticated %}

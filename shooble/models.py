@@ -51,3 +51,12 @@ class UserBio(models.Model):
     def __str__(self):
         return self.user.username + " bio"
 
+
+class PostComment(models.Model):
+    author = models.ForeignKey(User, on_delete=models.CASCADE, default=None)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, default=None)
+    created_at = models.DateTimeField(auto_now_add=True)
+    textBody = models.TextField(max_length=500)
+
+    def __str__(self):
+        return self.textBody

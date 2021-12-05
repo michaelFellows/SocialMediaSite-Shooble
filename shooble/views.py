@@ -3,15 +3,21 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from .models import Following, Post, LikedPost, ProfilePic, UserBio
+from .models import Following, Post, LikedPost, ProfilePic, UserBio, PostComment
 from .forms import UserForm, ProfilePicForm
+from django.db.models import Q
 
 
 @login_required(login_url='login')
 def index(request):
     users_being_followed = Following.objects.filter(userFollower=request.user)
+    comments = PostComment.objects.order_by('created_at')
+    print(comments)
     text_posts = []
     list_of_like_data = []
+    list_of_comments = []
+    for i in comments:
+        list_of_comments.append(i)
     # list_of_all_posts = []
     ordered_text_posts = Post.objects.order_by('created_at')
     # # To get top 3 trending users:
@@ -24,6 +30,10 @@ def index(request):
     # print(list_of_all_posts)
     counter = 0
     for i in ordered_text_posts:
+        if i.author.id == request.user.id:
+            list_of_like_data.append(
+                i.likedpost_set.filter(user_liking=request.user, post=i).get().is_liked_by_user)
+            text_posts.append(i)
         for j in users_being_followed:
             if i.author.id == j.userID_following:
                 list_of_like_data.append(
@@ -32,10 +42,12 @@ def index(request):
                 counter += 1
     text_posts.reverse()
     list_of_like_data.reverse()
+    list_of_comments.reverse()
     print(list_of_like_data)
     context = {
         'text_posts': text_posts,
-        'list_of_like_data': list_of_like_data
+        'list_of_like_data': list_of_like_data,
+        'comments': list_of_comments
     }
     return render(request, "shooble/index.html", context)
 
@@ -105,7 +117,11 @@ def logout_view(request):
 def search_shooble(request):
     if request.method == 'POST':
         search_query = request.POST.get('search')
-        users_searched = User.objects.filter(username__contains=search_query).exclude(username=request.user.username)
+        users_searched = User.objects.filter(
+            Q(username__contains=search_query) |
+            Q(first_name__contains=search_query) |
+            Q(last_name__contains=search_query)
+        ).exclude(username=request.user.username)
         users_being_followed = Following.objects.filter(userFollower=request.user)
         list_of_ids_being_followed = []
         for i in list(users_being_followed):
@@ -123,7 +139,13 @@ def search_shooble(request):
                 'search_query': search_query
             }
         return render(request, 'shooble/search.html', context)
-    return render(request, 'shooble/search.html')
+    users = User.objects.order_by('username')
+    print(users)
+    context = {
+        'user_searched': users,
+        'dont_show_query': True
+    }
+    return render(request, 'shooble/search.html', context)
 
 
 @login_required(login_url='login')
@@ -131,6 +153,11 @@ def profile_view(request, username):
     searched_user = User.objects.get(username=username)
     list_of_following = Following.objects.filter(userFollower=searched_user)  # Who the profile user follows
     list_of_followers = Following.objects.filter(userID_following=searched_user.id)  # Who is following the profile
+    comments = PostComment.objects.order_by('created_at')
+    list_of_comments = []
+    for i in comments:
+        list_of_comments.append(i)
+    list_of_comments.reverse()
     print(list_of_following)
     print(list_of_followers)
     ordered_text_posts = Post.objects.filter(author=searched_user).order_by('created_at')
@@ -158,6 +185,7 @@ def profile_view(request, username):
         'list_of_like_data': list_of_like_data,
         'list_of_ids_being_followed': list_of_ids_being_followed,
         'profile_pic_url': profile_pic.profile_pic.url,
+        'comments': list_of_comments
     }
     print(text_posts)
     print(list_of_like_data)
@@ -234,7 +262,6 @@ def like_post(request, postID):
 @login_required(login_url='login')
 def upload_profile_pic(request):
     """Process images uploaded by users"""
-
     if request.method == 'POST':
         image_form = ProfilePicForm(request.POST, request.FILES)
         form = UserForm(instance=request.user)
@@ -315,3 +342,16 @@ def is_followed_by(request, username):
         'user_being_checked': user_profile
     }
     return render(request, 'shooble/is-followed-by.html', context)
+
+
+@login_required(login_url='login')
+def make_comment(request, postID):
+    print("reached make_comment" + postID)
+    if request.is_ajax():
+        print('reached ajax of make comment')
+        current_post = Post.objects.get(id=postID)
+        comment_body = request.POST.get('comment')
+        comment = PostComment.objects.create(author=request.user, post=current_post, textBody=comment_body)
+        print(comment_body)
+        return redirect(request.META.get('HTTP_REFERER'))
+    return redirect(request.META.get('HTTP_REFERER'))
