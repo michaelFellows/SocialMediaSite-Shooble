@@ -1,6 +1,7 @@
 {% extends 'shooble/base.html' %}
 {% block body %}
     <h3>Users found with: "{{ search_query }}"</h3>
+    <p>This is some test text</p>
     <p>{{ no_users }}</p>
     <ul>
         {% for user_profile in user_searched %}
