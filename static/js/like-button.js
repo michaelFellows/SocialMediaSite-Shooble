@@ -12,6 +12,7 @@ $("form.like_button_class").on("submit", function (e) {
 });
 
 $("form.comment-class").on("submit", function (e) {
+
     console.log("banana")
     let dataString = $(this).serialize();
     let user_id = $(this).closest("form.comment-class").attr('id');
