@@ -16,7 +16,6 @@ $("form.comment-class").on("submit", function (e) {
     let dataString = $(this).serialize();
     let user_id = $(this).closest("form.comment-class").attr('id');
     user_id = user_id.replace('comment', '')
-    console.log(user_id + "bnananana")
     $.ajax({
         type: "POST",
         url: "/make-comment/" + user_id,
